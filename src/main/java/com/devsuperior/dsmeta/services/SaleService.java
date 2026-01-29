@@ -1,6 +1,8 @@
 package com.devsuperior.dsmeta.services;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +30,12 @@ public class SaleService {
 
 	@Transactional(readOnly = true)
 	public List<SummaryDTO> createSummary(String minDate, String maxDate) {
-		LocalDate minDateQuery = LocalDate.parse(minDate);
-		LocalDate maxDateQuery = LocalDate.parse(maxDate);
+
+		LocalDate maxDateQuery = maxDate.isBlank() ?
+				LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()) : LocalDate.parse(maxDate);
+
+		LocalDate minDateQuery = minDate.isBlank()
+				? maxDateQuery.minusYears(1L) : LocalDate.parse(minDate);
 
 		return repository.searchSummary(minDateQuery, maxDateQuery);
 	}
